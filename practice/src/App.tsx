@@ -1,12 +1,15 @@
 import styled, { keyframes } from "styled-components";
 
+import CircleOne from "./Circle";
+import { useState } from "react";
+
 interface BoxProps {
   readonly bgColor: string;
 }
 
 const Father = styled.div`
   display: flex;
-  background-color: ${(props) => props.theme.backgroundColor};
+  background-color: ${(props) => props.theme.bgColor};
 `;
 
 const Title = styled.h1`
@@ -67,6 +70,18 @@ const Circle = styled(BoxOne)<BoxProps>`
 `;
 
 function App() {
+  const [value, setValue] = useState("");
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const {
+      currentTarget: { value },
+    } = e;
+    setValue(value);
+  };
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log("hello", value);
+  };
+
   return (
     <Father as="header">
       <div>
@@ -94,6 +109,21 @@ function App() {
           <Emoji>😀</Emoji>
           <Emoji as="p">😀</Emoji>
         </Box>
+      </div>
+      <div>
+        <CircleOne bgColor="teal" borderColor="yellow" />
+        <CircleOne bgColor="tomato" text="i'm here" />
+      </div>
+      <div>
+        <form onSubmit={onSubmit}>
+          <input
+            type="text"
+            placeholder="username"
+            value={value}
+            onChange={onChange}
+          />
+          <button>Log in</button>
+        </form>
       </div>
     </Father>
   );
