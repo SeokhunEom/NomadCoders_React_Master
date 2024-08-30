@@ -1,13 +1,10 @@
-import App from "./App.tsx";
+import { RouterProvider } from "react-router-dom";
 import { StrictMode } from "react";
-import { ThemeProvider } from "styled-components";
 import { createRoot } from "react-dom/client";
-import { lightTheme } from "./theme.ts";
+import router from "./Router.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider theme={lightTheme}>
-      <App />
-    </ThemeProvider>
+    <RouterProvider router={router} />
   </StrictMode>
 );
