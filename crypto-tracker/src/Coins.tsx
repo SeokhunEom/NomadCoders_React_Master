@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
+import { fetchCoins } from "./api";
 import styled from "styled-components";
+import { useQuery } from "@tanstack/react-query";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -64,17 +64,11 @@ interface CoinInterface {
 }
 
 function Coins() {
-  const [coins, setCoins] = useState<CoinInterface[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch("https://api.coinpaprika.com/v1/coins");
-      const json = await response.json();
-      setCoins(json.slice(0, 100));
-      setIsLoading(false);
-    })();
-  }, []);
+  const { isLoading, data: coins } = useQuery<CoinInterface[]>({
+    queryKey: ["allCoins"],
+    queryFn: fetchCoins,
+    select: (data) => data.slice(0, 100),
+  });
 
   return (
     <Container>
@@ -85,7 +79,7 @@ function Coins() {
         <Loader>"Loading..."</Loader>
       ) : (
         <CoinsList>
-          {coins.map((coin) => (
+          {coins?.map((coin) => (
             <Coin key={coin.id}>
               <Link to={`/${coin.id}`} state={{ name: coin.name }}>
                 <Img

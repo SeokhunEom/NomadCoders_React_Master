@@ -5,9 +5,10 @@ import {
   useMatch,
   useParams,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { fetchCoinInfo, fetchCoinTickers } from "./api";
 
 import styled from "styled-components";
+import { useQuery } from "@tanstack/react-query";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -190,34 +191,26 @@ interface Usd {
 }
 
 function Coin() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>({} as InfoData);
-  const [priceInfo, setPriceInfo] = useState<PriceData>({} as PriceData);
   const { coinId } = useParams();
   const { state }: RouteState = useLocation();
   const chartMatch = useMatch(`/${coinId}/chart`);
   const priceMatch = useMatch(`/${coinId}/price`);
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>({
+    queryKey: ["info", coinId],
+    queryFn: () => fetchCoinInfo(coinId),
+  });
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>({
+    queryKey: ["tickers", coinId],
+    queryFn: () => fetchCoinTickers(coinId),
+  });
 
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setIsLoading(false);
-    })();
-  }, [coinId]);
+  const isLoading = infoLoading || tickersLoading;
 
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : isLoading ? "Loading..." : info?.name}
+          {state?.name ? state.name : isLoading ? "Loading..." : infoData?.name}
         </Title>
       </Header>
       {isLoading ? (
@@ -227,26 +220,26 @@ function Coin() {
           <Overview>
             <OverviewItem>
               <span>Rank</span>
-              <span>{info?.rank}</span>
+              <span>{infoData?.rank}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Symbol</span>
-              <span>{info?.symbol}</span>
+              <span>{infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Open source:</span>
-              <span>{info?.open_source ? "Yes" : "No"}</span>
+              <span>{infoData?.open_source ? "Yes" : "No"}</span>
             </OverviewItem>
           </Overview>
-          <Description>{info?.description}</Description>
+          <Description>{infoData?.description}</Description>
           <Overview>
             <OverviewItem>
-              <span>Total Suply:</span>
-              <span>{priceInfo?.total_supply}</span>
+              <span>Total Supply:</span>
+              <span>{tickersData?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Max Suply:</span>
-              <span>{priceInfo?.max_supply}</span>
+              <span>Max Supply:</span>
+              <span>{tickersData?.max_supply}</span>
             </OverviewItem>
           </Overview>
           <Tabs>
@@ -257,7 +250,6 @@ function Coin() {
               <Link to={`/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
-
           <Outlet />
         </>
       )}
