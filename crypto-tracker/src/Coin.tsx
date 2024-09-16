@@ -18,10 +18,21 @@ const Container = styled.div`
 `;
 
 const Header = styled.header`
+  position: relative;
   height: 10vh;
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const BackButton = styled(Link)`
+  position: absolute;
+  left: 20px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: ${({ theme }) => theme.textColor};
 `;
 
 const Title = styled.h1`
@@ -154,7 +165,7 @@ interface Whitepaper {
   thumbnail: string;
 }
 
-interface PriceData {
+export interface PriceData {
   id: string;
   name: string;
   symbol: string;
@@ -216,6 +227,7 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <BackButton to="/">⬅</BackButton>
         <Title>
           {state?.name ? state.name : isLoading ? "Loading..." : infoData?.name}
         </Title>

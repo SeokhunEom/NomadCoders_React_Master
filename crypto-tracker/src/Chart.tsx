@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import { fetchCoinHistoryTemp } from "./api";
 import ApexChart from "react-apexcharts";
+import { fetchCoinHistoryTemp } from "./api";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 interface HistoricalData {
   time_open: string;
@@ -22,6 +22,10 @@ function Chart() {
     queryFn: () => fetchCoinHistoryTemp(coinId),
     refetchInterval: 10000,
   });
+  const candlestickData = data?.map((price) => ({
+    x: new Date(price.time_close),
+    y: [price.open, price.high, price.low, price.close],
+  }));
 
   return (
     <div>
@@ -29,19 +33,15 @@ function Chart() {
         "Loading chart..."
       ) : (
         <ApexChart
-          type="line"
-          series={[
-            {
-              name: "Price",
-              data: data?.map((price) => price.close) as number[],
-            },
-          ]}
+          type="candlestick"
+          series={[{ data: candlestickData }]}
           options={{
             theme: {
               mode: "dark",
             },
             chart: {
-              height: 300,
+              type: "candlestick",
+              height: 350,
               width: 500,
               toolbar: {
                 show: false,
@@ -62,16 +62,6 @@ function Chart() {
               labels: { show: false },
               type: "datetime",
               categories: data?.map((price) => price.time_close),
-            },
-            fill: {
-              type: "gradient",
-              gradient: { gradientToColors: ["#0be881"], stops: [0, 100] },
-            },
-            colors: ["#0fbcf9"],
-            tooltip: {
-              y: {
-                formatter: (value) => `$${value.toFixed(2)}`,
-              },
             },
           }}
         />
