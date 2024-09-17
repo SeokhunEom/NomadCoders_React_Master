@@ -1,5 +1,7 @@
 import ApexChart from "react-apexcharts";
+import { IsDarkContext } from "./App";
 import { fetchCoinHistoryTemp } from "./api";
+import { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,6 +17,7 @@ interface HistoricalData {
 }
 
 function Chart() {
+  const { isDark } = useContext(IsDarkContext);
   const { coinId } = useParams();
 
   const { isLoading, data } = useQuery<HistoricalData[]>({
@@ -37,7 +40,7 @@ function Chart() {
           series={[{ data: candlestickData }]}
           options={{
             theme: {
-              mode: "dark",
+              mode: isDark ? "dark" : "light",
             },
             chart: {
               type: "candlestick",

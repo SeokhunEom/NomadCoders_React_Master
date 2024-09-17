@@ -1,8 +1,10 @@
+import { Helmet } from "react-helmet";
+import { IsDarkContext } from "./App";
 import { Link } from "react-router-dom";
 import { fetchCoins } from "./api";
 import styled from "styled-components";
+import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -17,13 +19,16 @@ const Header = styled.header`
   align-items: center;
 `;
 
-const CoinsList = styled.ul``;
+const CoinsList = styled.ul`
+  list-style-type: none;
+`;
 
 const Coin = styled.li`
-  background-color: white;
-  color: ${({ theme }) => theme.bgColor};
+  background-color: ${(props) => props.theme.cardBgColor};
+  color: ${(props) => props.theme.textColor};
   margin-bottom: 10px;
   border-radius: 15px;
+  border: 1px solid white;
 
   a {
     display: flex;
@@ -42,6 +47,17 @@ const Coin = styled.li`
 const Title = styled.h1`
   color: ${({ theme }) => theme.accentColor};
   font-size: 3rem;
+`;
+
+const DarkModeButton = styled.button`
+  background-color: ${({ theme }) => theme.accentColor};
+  color: ${({ theme }) => theme.textColor};
+  border: none;
+  border-radius: 15px;
+  padding: 10px 20px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in;
 `;
 
 const Loader = styled.div`
@@ -65,6 +81,7 @@ interface CoinInterface {
 }
 
 function Coins() {
+  const { toggleDark } = useContext(IsDarkContext);
   const { isLoading, data: coins } = useQuery<CoinInterface[]>({
     queryKey: ["allCoins"],
     queryFn: fetchCoins,
@@ -78,6 +95,7 @@ function Coins() {
       </Helmet>
       <Header>
         <Title>Coins</Title>
+        <DarkModeButton onClick={toggleDark}>Toggle Dark Mode</DarkModeButton>
       </Header>
       {isLoading ? (
         <Loader>"Loading..."</Loader>
