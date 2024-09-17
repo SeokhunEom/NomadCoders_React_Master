@@ -1,10 +1,10 @@
 import { Helmet } from "react-helmet";
-import { IsDarkContext } from "./App";
 import { Link } from "react-router-dom";
 import { fetchCoins } from "./api";
+import { isDarkAtom } from "./atoms";
 import styled from "styled-components";
-import { useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSetRecoilState } from "recoil";
 
 const Container = styled.div`
   padding: 0 20px;
@@ -81,12 +81,16 @@ interface CoinInterface {
 }
 
 function Coins() {
-  const { toggleDark } = useContext(IsDarkContext);
+  const setDarkAtom = useSetRecoilState(isDarkAtom);
   const { isLoading, data: coins } = useQuery<CoinInterface[]>({
     queryKey: ["allCoins"],
     queryFn: fetchCoins,
     select: (data) => data.slice(0, 100),
   });
+
+  const toggleDarkAtom = () => {
+    setDarkAtom((prev) => !prev);
+  };
 
   return (
     <Container>
@@ -95,7 +99,9 @@ function Coins() {
       </Helmet>
       <Header>
         <Title>Coins</Title>
-        <DarkModeButton onClick={toggleDark}>Toggle Dark Mode</DarkModeButton>
+        <DarkModeButton onClick={toggleDarkAtom}>
+          Toggle Dark Mode
+        </DarkModeButton>
       </Header>
       {isLoading ? (
         <Loader>"Loading..."</Loader>

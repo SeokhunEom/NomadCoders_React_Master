@@ -1,9 +1,9 @@
 import ApexChart from "react-apexcharts";
-import { IsDarkContext } from "./App";
 import { fetchCoinHistoryTemp } from "./api";
-import { useContext } from "react";
+import { isDarkAtom } from "./atoms";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useRecoilValue } from "recoil";
 
 interface HistoricalData {
   time_open: string;
@@ -17,7 +17,7 @@ interface HistoricalData {
 }
 
 function Chart() {
-  const { isDark } = useContext(IsDarkContext);
+  const isDark = useRecoilValue(isDarkAtom);
   const { coinId } = useParams();
 
   const { isLoading, data } = useQuery<HistoricalData[]>({
