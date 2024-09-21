@@ -4,6 +4,7 @@ import { useSetRecoilState } from "recoil";
 
 function ToDo({ text, category, id }: ToDo) {
   const setToDos = useSetRecoilState(toDoState);
+
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const { name } = event.currentTarget;
     setToDos((oldToDos) => {
@@ -14,6 +15,10 @@ function ToDo({ text, category, id }: ToDo) {
         ...oldToDos.slice(targetIndex + 1),
       ];
     });
+  };
+
+  const onDelete = () => {
+    setToDos((oldToDos) => oldToDos.filter((toDo) => toDo.id !== id));
   };
 
   return (
@@ -34,6 +39,7 @@ function ToDo({ text, category, id }: ToDo) {
           {Categories.DONE}
         </button>
       )}
+      <button onClick={onDelete}>DELETE</button>
     </li>
   );
 }
