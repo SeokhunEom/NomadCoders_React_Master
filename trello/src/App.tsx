@@ -1,6 +1,7 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 
 import Board from "./components/Board";
+import Trash from "./components/Trash";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
 import { useRecoilState } from "recoil";
@@ -12,6 +13,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  position: relative;
 `;
 
 const Boards = styled.div`
@@ -28,6 +30,17 @@ function App() {
   const onDragEnd = (info: DropResult) => {
     const { destination, source } = info;
     if (!destination) return;
+
+    if (destination.droppableId === "Trash") {
+      setToDos((allBoards) => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        return {
+          ...allBoards,
+          [source.droppableId]: boardCopy,
+        };
+      });
+    }
 
     if (destination.droppableId === source.droppableId) {
       setToDos((allBoards) => {
@@ -64,6 +77,7 @@ function App() {
             <Board key={boardId} boardId={boardId} toDos={toDos[boardId]} />
           ))}
         </Boards>
+        <Trash boardId="Trash" />
       </Wrapper>
     </DragDropContext>
   );
