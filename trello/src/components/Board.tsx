@@ -7,9 +7,14 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
 
+interface WrapperProps {
+  isDragging: boolean;
+}
+
 interface BoardProps {
   toDos: ToDo[];
   boardId: string;
+  isDragging: boolean;
 }
 
 interface AreaProps {
@@ -21,10 +26,11 @@ interface FormProps {
   toDo: string;
 }
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<WrapperProps>`
   width: 300px;
   padding-top: 10px;
-  background-color: ${(props) => props.theme.boardColor};
+  background-color: ${(props) =>
+    props.isDragging ? "lightcoral" : props.theme.boardColor};
   border-radius: 5px;
   min-height: 300px;
   display: flex;
@@ -68,7 +74,7 @@ const Form = styled.form`
   }
 `;
 
-const Board = ({ toDos, boardId }: BoardProps) => {
+const Board = ({ toDos, boardId, isDragging }: BoardProps) => {
   const setToDos = useSetRecoilState(toDoState);
   const { register, setValue, handleSubmit } = useForm<FormProps>();
 
@@ -87,7 +93,7 @@ const Board = ({ toDos, boardId }: BoardProps) => {
   };
 
   return (
-    <Wrapper>
+    <Wrapper isDragging={isDragging}>
       <Title>{boardId}</Title>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
@@ -96,13 +102,13 @@ const Board = ({ toDos, boardId }: BoardProps) => {
           placeholder={`Add task on ${boardId}`}
         />
       </Form>
-      <Droppable droppableId={boardId}>
-        {(magic, info) => (
+      <Droppable droppableId={boardId} type="task">
+        {(provided, snapshot) => (
           <Area
-            isDraggingOver={info.isDraggingOver}
-            isDraggingFromThis={Boolean(info.draggingFromThisWith)}
-            ref={magic.innerRef}
-            {...magic.droppableProps}
+            isDraggingOver={snapshot.isDraggingOver}
+            isDraggingFromThis={Boolean(snapshot.draggingFromThisWith)}
+            ref={provided.innerRef}
+            {...provided.droppableProps}
           >
             {toDos.map((toDo, index) => (
               <DraggableCard
@@ -112,7 +118,7 @@ const Board = ({ toDos, boardId }: BoardProps) => {
                 toDoText={toDo.text}
               />
             ))}
-            {magic.placeholder}
+            {provided.placeholder}
           </Area>
         )}
       </Droppable>

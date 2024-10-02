@@ -48,7 +48,7 @@ const TrashIcon = styled(PhTrash)`
 
 const Trash = ({ boardId }: TrashProps) => {
   return (
-    <Droppable droppableId={boardId}>
+    <Droppable droppableId={boardId} type="task">
       {(provided, snapshot) => (
         <TrashContainer
           isDraggingOver={snapshot.isDraggingOver}

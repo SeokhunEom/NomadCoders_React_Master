@@ -21,12 +21,12 @@ const Card = styled.div<{ isDragging: boolean }>`
 const DraggableCard = ({ toDoId, toDoText, index }: DraggableCardProps) => {
   return (
     <Draggable draggableId={String(toDoId)} index={index}>
-      {(magic, snapshot) => (
+      {(provided, snapshot) => (
         <Card
           isDragging={snapshot.isDragging}
-          ref={magic.innerRef}
-          {...magic.draggableProps}
-          {...magic.dragHandleProps}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
         >
           {toDoText}
         </Card>
