@@ -1,8 +1,9 @@
+import { boardState, toDoState } from "../atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
+
 import Board from "./Board";
 import { Draggable } from "react-beautiful-dnd";
 import React from "react";
-import { toDoState } from "../atoms";
-import { useRecoilValue } from "recoil";
 
 interface DraggableBoardProps {
   boardId: string;
@@ -11,6 +12,19 @@ interface DraggableBoardProps {
 
 const DraggableBoard = ({ boardId, index }: DraggableBoardProps) => {
   const toDos = useRecoilValue(toDoState);
+  const [_, setBoardOrder] = useRecoilState(boardState);
+  const setToDosSetter = useRecoilState(toDoState)[1];
+
+  const deleteBoard = (boardIdToDelete: string) => {
+    setBoardOrder((prevBoardOrder) =>
+      prevBoardOrder.filter((id) => id !== boardIdToDelete)
+    );
+
+    setToDosSetter((prevToDos) => {
+      const { [boardIdToDelete]: _, ...rest } = prevToDos;
+      return rest;
+    });
+  };
 
   return (
     <Draggable draggableId={boardId} index={index}>
@@ -24,6 +38,7 @@ const DraggableBoard = ({ boardId, index }: DraggableBoardProps) => {
             boardId={boardId}
             toDos={toDos[boardId]}
             isDragging={snapshot.isDragging}
+            onDeleteBoard={deleteBoard}
           />
         </div>
       )}
