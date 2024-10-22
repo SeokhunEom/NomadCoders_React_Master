@@ -1,4 +1,4 @@
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import {
   motion,
   useAnimation,
@@ -7,6 +7,7 @@ import {
 } from "framer-motion";
 
 import styled from "styled-components";
+import { useForm } from "react-hook-form";
 import { useState } from "react";
 
 const Nav = styled(motion.nav)`
@@ -55,7 +56,7 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   color: white;
   display: flex;
   align-items: center;
@@ -111,6 +112,10 @@ const navVariants = {
   },
 };
 
+interface FormProps {
+  keyword: string;
+}
+
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useMatch("/");
@@ -118,6 +123,12 @@ function Header() {
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm<FormProps>();
+
+  const onValid = (data: FormProps) => {
+    navigate(`/search?keyword=${data.keyword}`);
+  };
 
   const toggleSearch = () => {
     if (searchOpen) {
@@ -164,7 +175,7 @@ function Header() {
         </Items>
       </Col>
       <Col>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
             animate={{ x: searchOpen ? -185 : 0 }}
@@ -180,6 +191,7 @@ function Header() {
             ></path>
           </motion.svg>
           <Input
+            {...register("keyword", { required: true, minLength: 2 })}
             animate={inputAnimation}
             initial={{ scaleX: 0 }}
             placeholder="Search for movie or tv show..."
