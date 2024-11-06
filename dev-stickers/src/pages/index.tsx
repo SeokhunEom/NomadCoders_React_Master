@@ -1,16 +1,23 @@
+import { GatsbyImage, StaticImage, getImage } from "gatsby-plugin-image";
+import { PageProps, graphql } from "gatsby";
+
 import Layout from "../components/Layout";
 import React from "react";
 import Seo from "../components/Seo";
-import { StaticImage } from "gatsby-plugin-image";
 
-const IndexPage = () => {
+const IndexPage = ({ data }: PageProps<Queries.StickersQuery>) => {
   return (
     <Layout title="Welcome to DevStickers">
-      <StaticImage
-        width={200}
-        src="https://images.unsplash.com/photo-1625768376503-68d2495d78c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1450&q=80"
-        alt="dev stickers"
-      />
+      {data.allContentfulSticker.nodes.map((sticker) => (
+        <article key={sticker.name}>
+          <GatsbyImage
+            image={getImage(sticker.preview?.gatsbyImageData!)!}
+            alt={sticker.name!}
+          />
+          <h2>{sticker.name}</h2>
+          <h4>${sticker.price}</h4>
+        </article>
+      ))}
     </Layout>
   );
 };
@@ -18,3 +25,17 @@ const IndexPage = () => {
 export default IndexPage;
 
 export const Head = () => <Seo title="Home" />;
+
+export const query = graphql`
+  query Stickers {
+    allContentfulSticker {
+      nodes {
+        name
+        price
+        image {
+          gatsbyImageData(placeholder: BLURRED, height: 250)
+        }
+      }
+    }
+  }
+`;
